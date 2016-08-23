@@ -1,0 +1,50 @@
+'@type': "SoftwareComponentType"
+createdDate: "2016-07-31T12:27:10.925Z"
+lastUpdated: "2016-07-31T12:27:29.664Z"
+id: "Software.SoftwareWebIIS"
+name: "Software.Web.IIS"
+description: "Install IIS roles with all features"
+publishStatus: "PUBLISHED"
+publishStatusName: "Published"
+schema:
+  fields:
+  - id: "host"
+    label: "Container"
+    dataType:
+      type: "ref"
+      componentTypeId: "com.vmware.csp.iaas.blueprint.service"
+      classId: "Infrastructure.Machine.Schema"
+      label: "Machine"
+    state:
+      dependencies: []
+      facets:
+      - type: "internal"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: true
+      - type: "visible"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: false
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+containerFieldId: "host"
+lifecycleTasks:
+- createdDate: "2016-07-31T12:27:10.927Z"
+  lastUpdated: "2016-07-31T12:27:10.927Z"
+  script:
+    scriptContent: "Add-WindowsFeature web-server -IncludeAllSubFeature"
+    isRebootAfter: false
+    scriptTypeId: "powershell"
+  taskDescriptorRef:
+    id: "INSTALL"
+    label: "Install"

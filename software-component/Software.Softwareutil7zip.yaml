@@ -1,0 +1,75 @@
+'@type': "SoftwareComponentType"
+createdDate: "2016-07-26T23:10:36.600Z"
+lastUpdated: "2016-08-23T01:56:52.835Z"
+id: "Software.Softwareutil7zip"
+name: "Software.util.7zip"
+description: "Install 7zip from http location"
+publishStatus: "PUBLISHED"
+publishStatusName: "Published"
+schema:
+  fields:
+  - id: "installerPath"
+    label: "installerPath"
+    description: "Install path of executible"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "http://downloads.sourceforge.net/project/sevenzip/7-Zip/16.02/7z1602-x64.exe?r=https%3A%2F%2Fwww.google.com.au&ts=1471917310&use_mirror=internode"
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+  - id: "host"
+    label: "Container"
+    description: ""
+    dataType:
+      type: "ref"
+      componentTypeId: "com.vmware.csp.iaas.blueprint.service"
+      classId: "Infrastructure.Machine.Schema"
+      label: "Machine"
+    state:
+      dependencies: []
+      facets:
+      - type: "internal"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: true
+      - type: "visible"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: false
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+containerFieldId: "host"
+lifecycleTasks:
+- createdDate: "2016-07-26T23:10:36.601Z"
+  lastUpdated: "2016-08-23T01:56:52.835Z"
+  script:
+    scriptContent: "if (! (test-path c:\\temp)){\n\tmkdir c:\\temp\n}\n\n[System.Net.ServicePointManager]::ServerCertificateValidationCallback={$true}\n\
+      $env:path +=\",C:\\temp\\\"\n(New-Object Net.Webclient).DownloadFile(\"$installerPath\"\
+      ,'C:\\temp\\7zip.exe')\n\nc:\\temp\\7zip.exe /S"
+    isRebootAfter: false
+    scriptTypeId: "powershell"
+  taskDescriptorRef:
+    id: "INSTALL"
+    label: "Install"

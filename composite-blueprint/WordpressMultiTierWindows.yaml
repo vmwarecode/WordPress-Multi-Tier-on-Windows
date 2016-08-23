@@ -1,0 +1,258 @@
+id: WordpressMultiTierWindows
+name: Wordpress Multi-Tier - Windows
+description: ''
+status: PUBLISHED
+properties:
+  _debug_deployment:
+    default: 'true'
+    secured: false
+    visible: false
+components:
+  '10100024':
+    type: Infrastructure.Network.Network.Existing
+    data:
+      name:
+        fixed: '10100024'
+      network_profile:
+        fixed: 10.10.0.0/24
+  Action.mysql.createdb_1:
+    type: Software.Actionmysqlcreatedb
+    dependsOn:
+    - Software.db.mysql_2
+    data:
+      dbName:
+        default: ''
+        required: true
+        visible: true
+      dbUserPassword:
+        default: ${Software.db.mysql_2~dpRootPassword}
+        required: true
+        secured: false
+        visible: false
+      host:
+        fixed: ${_resource~wp-database}
+  Action.wpress.setdatabase_1:
+    type: Software.Actionwpresssetdatabase
+    dependsOn:
+    - Software.web.wpress_1
+    - Action.mysql.createdb_1
+    data:
+      dbIP:
+        default: ${_resource~wp-database~ip_address}
+        required: true
+      dbName:
+        default: ${Action.mysql.createdb_1~dbName}
+        required: true
+      dbPassword:
+        default: ${Action.mysql.createdb_1~dbUserPassword}
+        required: true
+        secured: false
+      dbPort:
+        default: ${Software.db.mysql_2~dpPort}
+        required: true
+      host:
+        fixed: ${_resource~wp-web}
+  Software.Web.IIS_1:
+    type: Software.SoftwareWebIIS
+    dependsOn:
+    - Software.util.7zip_1
+    data:
+      host:
+        fixed: ${_resource~wp-web}
+  Software.db.mysql_2:
+    type: Software.Softwaredbmysql
+    data:
+      dpPort:
+        default: '3306'
+        required: true
+      dpRootPassword:
+        default: ''
+        required: true
+        secured: false
+        visible: true
+      host:
+        fixed: ${_resource~wp-database}
+      installerPath:
+        default: https://vra7cafe.virtualiseme.com.au/artifactory/binrepo/mariadb-10.1.16-winx64.msi
+        required: true
+  Software.util.7zip_1:
+    type: Software.Softwareutil7zip
+    data:
+      host:
+        fixed: ${_resource~wp-web}
+      installerPath:
+        default: https://vra7cafe.virtualiseme.com.au/artifactory/binrepo/7z1602-x64.exe
+        required: true
+  Software.web.php_1:
+    type: Software.Softwarewebphp
+    data:
+      host:
+        fixed: ${_resource~Software.web.wpi_1}
+  Software.web.wpi_1:
+    type: Software.Softwarewebwpi
+    dependsOn:
+    - Software.Web.IIS_1
+    data:
+      host:
+        fixed: ${_resource~wp-web}
+      installerPath:
+        default: http://download.microsoft.com/download/C/F/F/CFF3A0B8-99D4-41A2-AE1A-496C08BEB904/WebPlatformInstaller_amd64_en-US.msi
+        required: true
+  Software.web.wpress_1:
+    type: Software.Softwarewebwpress
+    dependsOn:
+    - Software.web.php_1
+    data:
+      host:
+        fixed: ${_resource~wp-web}
+      installerPath:
+        default: https://wordpress.org/latest.zip
+        required: true
+  wp-database:
+    type: Infrastructure.CatalogItem.Machine.Virtual.vSphere
+    data:
+      _cluster:
+        default: 1
+        max: 1
+        min: 1
+      action:
+        fixed: LinkedClone
+      allow_storage_policies:
+        fixed: false
+      blueprint_type:
+        fixed: '1'
+      cpu:
+        default: 2
+        max: 2
+        min: 2
+      disks:
+      - capacity: 40
+        custom_properties: null
+        id: 1471871040684
+        initial_location: ''
+        is_clone: true
+        label: Hard disk 1
+        storage_reservation_policy: ''
+        userCreated: false
+        volumeId: 0
+      guest_customization_specification: vra7 windows
+      machine_prefix:
+        fixed:
+          id: vra7-win-
+      max_network_adapters: {}
+      max_volumes: {}
+      memory:
+        default: 2048
+        max: 4096
+        min: 2048
+      nics:
+      - address: ''
+        assignment_type: Static
+        id: 0
+        load_balancing: ''
+        network: ${_resource~10100024}
+        network_profile: 10.10.0.0/24
+      provisioning_workflow:
+        fixed:
+          id: CloneWorkflow
+          label: CloneWorkflow
+      reservation_policy:
+        id: virtuailseme01
+        label: virtuailseme01
+      security_groups: []
+      security_tags: []
+      source_machine:
+        fixed:
+          id: a064f8ae-5943-438e-a7f5-0a0548d8eeb2
+          label: vRA7-template-2012-link
+      source_machine_external_snapshot:
+        fixed: 3
+      source_machine_name:
+        fixed: vRA7-template-2012-link
+      source_machine_vmsnapshot:
+        fixed:
+          id: '1388'
+      storage:
+        default: 40
+        max: 40
+        min: 40
+  wp-web:
+    type: Infrastructure.CatalogItem.Machine.Virtual.vSphere
+    data:
+      _cluster:
+        default: 1
+        max: 1
+        min: 1
+      action:
+        fixed: LinkedClone
+      allow_storage_policies:
+        fixed: false
+      blueprint_type:
+        fixed: '1'
+      cpu:
+        default: 2
+        max: 2
+        min: 2
+      disks:
+      - capacity: 40
+        custom_properties: null
+        id: 1471870988500
+        initial_location: ''
+        is_clone: true
+        label: Hard disk 1
+        storage_reservation_policy: ''
+        userCreated: false
+        volumeId: 0
+      guest_customization_specification: vra7 windows
+      machine_prefix:
+        fixed:
+          id: vra7-win-
+      max_network_adapters: {}
+      max_volumes: {}
+      memory:
+        default: 2048
+        max: 4096
+        min: 2048
+      nics:
+      - address: ''
+        assignment_type: Static
+        id: 0
+        load_balancing: ''
+        network: ${_resource~10100024}
+        network_profile: 10.10.0.0/24
+      provisioning_workflow:
+        fixed:
+          id: CloneWorkflow
+          label: CloneWorkflow
+      reservation_policy:
+        id: virtuailseme01
+        label: virtuailseme01
+      security_groups: []
+      security_tags: []
+      source_machine:
+        fixed:
+          id: a064f8ae-5943-438e-a7f5-0a0548d8eeb2
+          label: vRA7-template-2012-link
+      source_machine_external_snapshot:
+        fixed: 3
+      source_machine_name:
+        fixed: vRA7-template-2012-link
+      source_machine_vmsnapshot:
+        fixed:
+          id: '1388'
+      storage:
+        default: 40
+        max: 40
+        min: 40
+layout:
+  '10100024': 1,0
+  Action.mysql.createdb_1: 1,0
+  Action.wpress.setdatabase_1: 4,0
+  Software.Web.IIS_1: 1,0
+  Software.db.mysql_2: 0,0
+  Software.util.7zip_1: 0,0
+  Software.web.php_1: 0,0
+  Software.web.wpi_1: 2,0
+  Software.web.wpress_1: 3,0
+  wp-database: 0,1
+  wp-web: 0,0

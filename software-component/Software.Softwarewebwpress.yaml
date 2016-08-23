@@ -1,0 +1,76 @@
+'@type': "SoftwareComponentType"
+createdDate: "2016-07-31T13:20:43.313Z"
+lastUpdated: "2016-07-31T13:34:08.799Z"
+id: "Software.Softwarewebwpress"
+name: "Software.web.wpress"
+description: "wordpress download"
+publishStatus: "PUBLISHED"
+publishStatusName: "Published"
+schema:
+  fields:
+  - id: "installerPath"
+    label: "installerPath"
+    description: "Install path of executible"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "https://wordpress.org/latest.zip"
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+  - id: "host"
+    label: "Container"
+    description: ""
+    dataType:
+      type: "ref"
+      componentTypeId: "com.vmware.csp.iaas.blueprint.service"
+      classId: "Infrastructure.Machine.Schema"
+      label: "Machine"
+    state:
+      dependencies: []
+      facets:
+      - type: "internal"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: true
+      - type: "visible"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: false
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+containerFieldId: "host"
+lifecycleTasks:
+- createdDate: "2016-07-31T13:20:43.314Z"
+  lastUpdated: "2016-08-02T11:58:56.858Z"
+  script:
+    scriptContent: "if (! (test-path c:\\temp)){\n\tmkdir c:\\temp\n}\n\n[System.Net.ServicePointManager]::ServerCertificateValidationCallback={$true}\n\
+      $env:path +=\",C:\\temp\\\"\n(New-Object Net.Webclient).DownloadFile(\"$installerPath\"\
+      ,'C:\\temp\\wp.zip')\n\nc:\\temp\\wp.zip /quiet\n\ncd \"C:\\Program Files\\\
+      7-Zip\"\n./7z.exe x c:\\temp\\wp.zip -oC:\\inetpub\\wwwroot\\"
+    isRebootAfter: false
+    scriptTypeId: "powershell"
+  taskDescriptorRef:
+    id: "INSTALL"
+    label: "Install"

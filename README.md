@@ -1,1 +1,0 @@
-# WordPress-Multi-Tier-on-Windows

@@ -1,0 +1,75 @@
+'@type': "SoftwareComponentType"
+createdDate: "2016-07-31T12:39:16.333Z"
+lastUpdated: "2016-07-31T12:39:34.881Z"
+id: "Software.Softwarewebwpi"
+name: "Software.web.wpi"
+description: "InstallWeb Platform Installer"
+publishStatus: "PUBLISHED"
+publishStatusName: "Published"
+schema:
+  fields:
+  - id: "installerPath"
+    label: "installerPath"
+    description: "Install path of executible"
+    dataType:
+      type: "primitive"
+      typeId: "STRING"
+    state:
+      dependencies: []
+      facets:
+      - type: "defaultValue"
+        value:
+          type: "constant"
+          value:
+            type: "string"
+            value: "http://download.microsoft.com/download/C/F/F/CFF3A0B8-99D4-41A2-AE1A-496C08BEB904/WebPlatformInstaller_amd64_en-US.msi"
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+  - id: "host"
+    label: "Container"
+    description: ""
+    dataType:
+      type: "ref"
+      componentTypeId: "com.vmware.csp.iaas.blueprint.service"
+      classId: "Infrastructure.Machine.Schema"
+      label: "Machine"
+    state:
+      dependencies: []
+      facets:
+      - type: "internal"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: true
+      - type: "visible"
+        value:
+          type: "constantClause"
+          value:
+            type: "boolean"
+            value: false
+      - type: "mandatory"
+        value:
+          type: "constant"
+          value:
+            type: "boolean"
+            value: true
+    isMultiValued: false
+containerFieldId: "host"
+lifecycleTasks:
+- createdDate: "2016-07-31T12:39:16.334Z"
+  lastUpdated: "2016-07-31T12:39:16.334Z"
+  script:
+    scriptContent: "if (! (test-path c:\\temp)){\n\tmkdir c:\\temp\n}\n\n[System.Net.ServicePointManager]::ServerCertificateValidationCallback={$true}\n\
+      $env:path +=\",C:\\temp\\\"\n(New-Object Net.Webclient).DownloadFile(\"$installerPath\"\
+      ,'C:\\temp\\wpi.msi')\n\nc:\\temp\\wpi.msi /quiet"
+    isRebootAfter: false
+    scriptTypeId: "powershell"
+  taskDescriptorRef:
+    id: "INSTALL"
+    label: "Install"
